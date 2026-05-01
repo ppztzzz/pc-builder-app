@@ -16,4 +16,10 @@ export const buildService = {
   },
 
   detail: (id: string) => prisma.build.findUnique({ where: { id } }),
+
+  list: (limit = 12) =>
+    prisma.build.findMany({
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    }),
 }

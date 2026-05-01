@@ -4,28 +4,34 @@ import { useEffect, useState } from "react"
 import { HeroBanner } from "@/frontend/components/home/HeroBanner"
 import { Article } from "@/frontend/components/home/Article"
 import { News } from "@/frontend/components/home/News"
-import { CategoryRow } from "@/frontend/components/home/CategoryRow"
+import { Components } from "@/frontend/components/home/Components"
+import { Builds } from "@/frontend/components/home/Builds"
 import { articleApi } from "@/frontend/api/articleApi"
-import { categoryApi } from "@/frontend/api/categoryApi"
+import { componentApi } from "@/frontend/api/componentApi"
+import { buildApi } from "@/frontend/api/buildApi"
 import type { ArticleResponse } from "@/shared/types/article"
-import type { CategoryResponse } from "@/shared/types/category"
+import type { ComponentResponse } from "@/shared/types/component"
+import type { BuildListItem } from "@/shared/types/build"
 
 export default function HomePage() {
-  const [categories, setCategories] = useState<CategoryResponse[]>([])
   const [articles, setArticles] = useState<ArticleResponse[]>([])
   const [news, setNews] = useState<ArticleResponse[]>([])
+  const [components, setComponents] = useState<ComponentResponse[]>([])
+  const [builds, setBuilds] = useState<BuildListItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([
-      categoryApi.list(),
       articleApi.list("ARTICLE"),
       articleApi.list("NEWS"),
+      componentApi.list(),
+      buildApi.list(6),
     ])
-      .then(([cats, arts, newsList]) => {
-        setCategories(cats)
+      .then(([arts, newsList, comps, buildsList]) => {
         setArticles(arts)
         setNews(newsList)
+        setComponents(comps)
+        setBuilds(buildsList)
       })
       .catch((e) => {
         console.error("Home page load failed:", e)
@@ -46,7 +52,8 @@ export default function HomePage() {
       <HeroBanner />
       <Article articles={articles} />
       <News articles={news} />
-      <CategoryRow categories={categories} />
+      <Components components={components} />
+      <Builds builds={builds} />
     </>
   )
 }

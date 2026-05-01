@@ -31,3 +31,14 @@ export type CreateBuildRequest = {
 export type HydratedBuild = BuildResponse & {
   hydrated: Partial<Record<ComponentType, ComponentResponse>>
 }
+
+// Compact list item — only CPU/GPU info needed for cards
+export type BuildListItem = {
+  id: string
+  totalPrice: number
+  createdAt: string
+  cpuName: string | null
+  gpuName: string | null
+  cpuImage: string | null
+  gpuImage: string | null
+}
