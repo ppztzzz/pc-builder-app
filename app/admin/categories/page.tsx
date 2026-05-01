@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react"
 import { categoryApi } from "@/frontend/api/categoryApi"
 import { CategoryForm } from "@/frontend/components/admin/CategoryForm"
 import { getIcon } from "@/shared/constants/icons"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import type { CategoryResponse } from "@/shared/types/category"
 
 type FormMode =
@@ -13,6 +14,7 @@ type FormMode =
   | { type: "edit"; category: CategoryResponse }
 
 export default function AdminCategoriesPage() {
+  useTitle("จัดการหมวดหมู่")
   const [categories, setCategories] = useState<CategoryResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState<FormMode>({ type: "none" })

@@ -7,8 +7,10 @@ import { articleApi } from "@/frontend/api/articleApi"
 import { categoryApi } from "@/frontend/api/categoryApi"
 import { componentApi } from "@/frontend/api/componentApi"
 import { useAuth } from "@/frontend/hooks/useAuth"
+import { useTitle } from "@/frontend/hooks/useTitle"
 
 export default function AdminDashboardPage() {
+  useTitle("แดชบอร์ด")
   const { username } = useAuth()
   const [stats, setStats] = useState({ articles: 0, categories: 0, components: 0 })
 

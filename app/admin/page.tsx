@@ -3,8 +3,10 @@
 import { useState } from "react"
 import { LogIn } from "lucide-react"
 import { authApi } from "@/frontend/api/authApi"
+import { useTitle } from "@/frontend/hooks/useTitle"
 
 export default function AdminLoginPage() {
+  useTitle("เข้าสู่ระบบ")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")

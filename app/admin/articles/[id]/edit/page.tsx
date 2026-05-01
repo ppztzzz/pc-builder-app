@@ -6,10 +6,12 @@ import { articleApi } from "@/frontend/api/articleApi"
 import { categoryApi } from "@/frontend/api/categoryApi"
 import { ArticleForm } from "@/frontend/components/admin/ArticleForm"
 import { ImageManager } from "@/frontend/components/admin/ImageManager"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import type { ArticleResponse } from "@/shared/types/article"
 import type { CategoryResponse } from "@/shared/types/category"
 
 export default function EditArticlePage() {
+  useTitle("แก้ไขบทความ")
   const params = useParams<{ id: string }>()
   const id = Number(params?.id)
 

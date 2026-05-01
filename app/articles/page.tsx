@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Search, X } from "lucide-react"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import { articleApi } from "@/frontend/api/articleApi"
 import { categoryApi } from "@/frontend/api/categoryApi"
 import { ArticleCard } from "@/frontend/components/article/ArticleCard"
@@ -64,6 +65,7 @@ export default function ArticlesPage() {
   }, [articles, categoryId, query])
 
   const heading = type === "NEWS" ? "ข่าวสารทั้งหมด" : type === "ARTICLE" ? "บทความทั้งหมด" : "บทความและข่าวสาร"
+  useTitle(type === "NEWS" ? "ข่าวสาร" : type === "ARTICLE" ? "บทความ" : "บทความและข่าวสาร")
   const eyebrow = type === "NEWS" ? "News" : "Library"
   const searchPlaceholder = type === "NEWS" ? "ค้นหาข่าวสาร..." : "ค้นหาบทความ..."
   const emptyText = type === "NEWS" ? "ไม่พบข่าวสาร" : "ไม่พบบทความ"

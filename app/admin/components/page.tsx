@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Plus, Pencil, Trash2 } from "lucide-react"
 import { componentApi } from "@/frontend/api/componentApi"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import {
   COMPONENT_TYPES,
   COMPONENT_TYPE_LABEL,
@@ -14,6 +15,7 @@ import type {
 } from "@/shared/types/component"
 
 export default function AdminComponentsPage() {
+  useTitle("จัดการชิ้นส่วน")
   const [components, setComponents] = useState<ComponentResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [filterType, setFilterType] = useState<ComponentType | "ALL">("ALL")

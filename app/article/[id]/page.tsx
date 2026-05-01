@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowLeft, Calendar } from "lucide-react"
 import { articleApi } from "@/frontend/api/articleApi"
 import { CategoryTag } from "@/frontend/components/ui/CategoryTag"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import type { ArticleResponse } from "@/shared/types/article"
 
 export default function ArticlePage() {
@@ -13,6 +14,8 @@ export default function ArticlePage() {
   const [article, setArticle] = useState<ArticleResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+
+  useTitle(article?.title ?? "")
 
   useEffect(() => {
     if (!params?.id) return

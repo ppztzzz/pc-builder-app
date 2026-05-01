@@ -5,10 +5,12 @@ import { useParams } from "next/navigation"
 import { componentApi } from "@/frontend/api/componentApi"
 import { categoryApi } from "@/frontend/api/categoryApi"
 import { ComponentForm } from "@/frontend/components/admin/ComponentForm"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import type { ComponentResponse } from "@/shared/types/component"
 import type { CategoryResponse } from "@/shared/types/category"
 
 export default function EditComponentPage() {
+  useTitle("แก้ไขชิ้นส่วน")
   const params = useParams<{ id: string }>()
   const id = Number(params?.id)
 

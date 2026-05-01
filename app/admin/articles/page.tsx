@@ -4,9 +4,11 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Plus, Pencil, Trash2, Star } from "lucide-react"
 import { articleApi } from "@/frontend/api/articleApi"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import type { ArticleResponse } from "@/shared/types/article"
 
 export default function AdminArticlesPage() {
+  useTitle("จัดการบทความ")
   const [articles, setArticles] = useState<ArticleResponse[]>([])
   const [loading, setLoading] = useState(true)
 

@@ -7,6 +7,7 @@ import { ArrowLeft, Share2 } from "lucide-react"
 import { buildApi } from "@/frontend/api/buildApi"
 import { PCCase } from "@/frontend/components/simulator/PCCase"
 import { BuildSummary } from "@/frontend/components/simulator/BuildSummary"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import type { HydratedBuild } from "@/shared/types/build"
 
 export default function BuildSharePage() {
@@ -14,6 +15,8 @@ export default function BuildSharePage() {
   const [build, setBuild] = useState<HydratedBuild | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+
+  useTitle(build ? `บิลด์ ${build.id}` : "")
 
   useEffect(() => {
     if (!params?.id) return

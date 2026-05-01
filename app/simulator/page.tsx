@@ -4,9 +4,11 @@ import { useEffect, useState } from "react"
 import { Gamepad2 } from "lucide-react"
 import { componentApi } from "@/frontend/api/componentApi"
 import { SimulatorClient } from "@/frontend/components/simulator/SimulatorClient"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import type { ComponentResponse } from "@/shared/types/component"
 
 export default function SimulatorPage() {
+  useTitle("ประกอบคอมเอง")
   const [components, setComponents] = useState<ComponentResponse[]>([])
   const [loading, setLoading] = useState(true)
 

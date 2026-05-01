@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import { HeroBanner } from "@/frontend/components/home/HeroBanner"
 import { Article } from "@/frontend/components/home/Article"
 import { News } from "@/frontend/components/home/News"
@@ -14,6 +15,7 @@ import type { ComponentResponse } from "@/shared/types/component"
 import type { BuildListItem } from "@/shared/types/build"
 
 export default function HomePage() {
+  useTitle("หน้าแรก")
   const [articles, setArticles] = useState<ArticleResponse[]>([])
   const [news, setNews] = useState<ArticleResponse[]>([])
   const [components, setComponents] = useState<ComponentResponse[]>([])
