@@ -3,9 +3,10 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Save, ArrowLeft } from "lucide-react"
+import { Save, ArrowLeft, X } from "lucide-react"
 import { componentApi } from "@/frontend/api/componentApi"
 import { SpecFields } from "./SpecFields"
+import { ImageUploader } from "./ImageUploader"
 import {
   COMPONENT_TYPES,
   COMPONENT_TYPE_LABEL,
@@ -187,14 +188,33 @@ export function ComponentForm({ categories, initial }: Props) {
           </div>
 
           <div>
-            <label className={labelClass}>URL รูปภาพ</label>
-            <input
-              type="text"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="/components/cpu-intel-i5.png"
-              className={inputClass}
-            />
+            <label className={labelClass}>รูปภาพ</label>
+            {imageUrl ? (
+              <div className="border-2 border-foreground p-2 flex items-center gap-3">
+                <img
+                  src={imageUrl}
+                  alt=""
+                  className="w-20 h-20 object-cover border border-border"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-muted truncate">{imageUrl}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setImageUrl("")}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs uppercase tracking-widest font-bold border border-foreground hover:bg-foreground hover:text-background transition"
+                >
+                  <X className="w-3 h-3" /> ลบ
+                </button>
+              </div>
+            ) : (
+              <ImageUploader
+                multiple={false}
+                onUploaded={(filenames) => {
+                  if (filenames[0]) setImageUrl(`/uploads/${filenames[0]}`)
+                }}
+              />
+            )}
           </div>
         </div>
 
@@ -202,9 +222,6 @@ export function ComponentForm({ categories, initial }: Props) {
           <p className={`${labelClass} mb-3`}>Specs ของ {COMPONENT_TYPE_LABEL[type]}</p>
           <div className="border-2 border-foreground p-4 bg-card">
             <SpecFields type={type} value={specs} onChange={setSpecs} />
-            <pre className="text-xs text-muted mt-4 p-2 bg-background overflow-x-auto">
-              {JSON.stringify(specs, null, 2)}
-            </pre>
           </div>
         </div>
       </div>
