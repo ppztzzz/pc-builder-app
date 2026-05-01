@@ -1,0 +1,90 @@
+// PC Builder Knowledge Site — Database Schema
+//
+// SQLite + Prisma — backend/prisma/schema.prisma
+// Run: `npm run db:push` (dev) or `npm run db:migrate` (with migration)
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==========================
+// AUTH
+// ==========================
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String   // bcrypt hashed
+  createdAt DateTime @default(now())
+}
+
+// ==========================
+// CONTENT
+// ==========================
+
+model Category {
+  id         Int         @id @default(autoincrement())
+  name       String
+  icon       String      // emoji เช่น "🧠"
+  articles   Article[]
+  components Component[]
+}
+
+model Article {
+  id         Int            @id @default(autoincrement())
+  title      String
+  content    String
+  excerpt    String?        // สรุปสำหรับการ์ดหน้าแรก
+  isFeatured Boolean        @default(false)
+  categoryId Int
+  category   Category       @relation(fields: [categoryId], references: [id])
+  images     ArticleImage[]
+  createdAt  DateTime       @default(now())
+
+  @@index([categoryId])
+  @@index([isFeatured])
+}
+
+model ArticleImage {
+  id        Int     @id @default(autoincrement())
+  articleId Int
+  image     String  // ชื่อไฟล์ใน public/uploads
+  isCover   Boolean @default(false)
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId])
+}
+
+// ==========================
+// SIMULATOR
+// ==========================
+
+model Component {
+  id          Int       @id @default(autoincrement())
+  name        String    // "Intel Core i5-13400"
+  type        String    // "CPU" | "RAM" | "MB" | "GPU" | "PSU" | "STORAGE" | "COOLER"
+  socket      String?   // "LGA1700" (CPU/MB)
+  specs       String    // JSON string เก็บ spec ละเอียด (tdp, cores, ramType, ...)
+  imageUrl    String
+  description String
+  price       Int       @default(0)
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  articleId   Int?      // link ไปบทความที่อธิบาย
+
+  @@index([type])
+  @@index([categoryId])
+}
+
+model Build {
+  id         String   @id // nanoid 8 chars
+  components String   // JSON: [{slot: "CPU", componentId: 5}, ...]
+  totalPrice Int?
+  fpsResult  String?  // JSON: {valorant: 240, gta: 90, cyberpunk: 60}
+  createdAt  DateTime @default(now())
+}
