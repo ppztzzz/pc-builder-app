@@ -1,3 +1,4 @@
+import { fetchJson, jsonInit } from "./_fetch"
 import type {
   ComponentResponse,
   ComponentType,
@@ -5,36 +6,21 @@ import type {
   UpdateComponentRequest,
 } from "@/shared/types/component"
 
-async function handleJson<T>(r: Response): Promise<T> {
-  const json = await r.json()
-  if (!r.ok) throw new Error(json.error ?? `HTTP ${r.status}`)
-  return json
-}
-
 export const componentApi = {
-  list: (): Promise<ComponentResponse[]> =>
-    fetch("/api/components").then(handleJson),
+  list: () => fetchJson<ComponentResponse[]>("/api/components"),
 
-  byType: (type: ComponentType): Promise<ComponentResponse[]> =>
-    fetch(`/api/components?type=${type}`).then(handleJson),
+  byType: (type: ComponentType) =>
+    fetchJson<ComponentResponse[]>(`/api/components?type=${type}`),
 
-  detail: (id: number): Promise<ComponentResponse> =>
-    fetch(`/api/components/${id}`).then(handleJson),
+  detail: (id: number) =>
+    fetchJson<ComponentResponse>(`/api/components/${id}`),
 
   create: (data: CreateComponentRequest) =>
-    fetch("/api/components", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }).then(handleJson),
+    fetchJson<ComponentResponse>("/api/components", jsonInit("POST", data)),
 
   update: (id: number, data: UpdateComponentRequest) =>
-    fetch(`/api/components/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }).then(handleJson),
+    fetchJson<ComponentResponse>(`/api/components/${id}`, jsonInit("PUT", data)),
 
-  delete: (id: number): Promise<void> =>
+  delete: (id: number) =>
     fetch(`/api/components/${id}`, { method: "DELETE" }).then(() => undefined),
 }

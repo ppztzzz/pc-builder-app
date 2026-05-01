@@ -21,12 +21,16 @@ export default function HomePage() {
       categoryApi.list(),
       articleApi.featured(),
       articleApi.list(),
-    ]).then(([cats, feat, list]) => {
-      setCategories(cats)
-      setFeatured(feat)
-      setArticles(list)
-      setLoading(false)
-    })
+    ])
+      .then(([cats, feat, list]) => {
+        setCategories(cats)
+        setFeatured(feat)
+        setArticles(list)
+      })
+      .catch((e) => {
+        console.error("Home page load failed:", e)
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   if (loading) {

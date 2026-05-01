@@ -1,36 +1,21 @@
+import { fetchJson, jsonInit } from "./_fetch"
 import type {
   CategoryResponse,
   CreateCategoryRequest,
   UpdateCategoryRequest,
 } from "@/shared/types/category"
 
-async function handleJson<T>(r: Response): Promise<T> {
-  const json = await r.json()
-  if (!r.ok) throw new Error(json.error ?? `HTTP ${r.status}`)
-  return json
-}
-
 export const categoryApi = {
-  list: (): Promise<CategoryResponse[]> =>
-    fetch("/api/categories").then(handleJson),
+  list: () => fetchJson<CategoryResponse[]>("/api/categories"),
 
-  detail: (id: number): Promise<CategoryResponse> =>
-    fetch(`/api/categories/${id}`).then(handleJson),
+  detail: (id: number) => fetchJson<CategoryResponse>(`/api/categories/${id}`),
 
-  create: (data: CreateCategoryRequest): Promise<CategoryResponse> =>
-    fetch("/api/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }).then(handleJson),
+  create: (data: CreateCategoryRequest) =>
+    fetchJson<CategoryResponse>("/api/categories", jsonInit("POST", data)),
 
-  update: (id: number, data: UpdateCategoryRequest): Promise<CategoryResponse> =>
-    fetch(`/api/categories/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }).then(handleJson),
+  update: (id: number, data: UpdateCategoryRequest) =>
+    fetchJson<CategoryResponse>(`/api/categories/${id}`, jsonInit("PUT", data)),
 
-  delete: (id: number): Promise<void> =>
+  delete: (id: number) =>
     fetch(`/api/categories/${id}`, { method: "DELETE" }).then(() => undefined),
 }
