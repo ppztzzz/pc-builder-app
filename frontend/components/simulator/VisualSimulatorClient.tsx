@@ -1,74 +1,228 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { DndContext, type DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { AlertCircle, CheckCircle, CircleDashed, Lightbulb } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import {
+  DndContext,
+  type DragEndEvent,
+  PointerSensor,
+  TouchSensor,
+  useDraggable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import { CSS } from "@dnd-kit/utilities"
+import {
+  AlertCircle,
+  CheckCircle,
+  CircleDashed,
+  Lightbulb,
+  MousePointer2,
+} from "lucide-react"
 import type { ComponentResponse, ComponentType } from "@/shared/types/component"
 import { COMPONENT_TYPE_LABEL } from "@/shared/types/component"
 import {
   checkCompat,
+  computeTotalPrice,
   computeTotalTdp,
   isBuildComplete,
   type SlotState,
 } from "@/frontend/lib/compatibility"
-import { ComponentSidebar } from "./ComponentSidebar"
+import { predictFps } from "@/frontend/lib/fps"
 import { VisualPCCase } from "./VisualPCCase"
-import { BuildSummary } from "./BuildSummary"
 
 type Props = {
   components: ComponentResponse[]
 }
 
-const REQUIRED_ORDER: ComponentType[] = [
-  "MB",
-  "CPU",
-  "COOLER",
-  "RAM",
-  "GPU",
-  "STORAGE",
-  "PSU",
-]
-
-function getNextStep(slots: SlotState): string {
-  const missing = REQUIRED_ORDER.find((type) => !slots[type])
-  if (!missing) return "ครบแล้ว ลองดูงบประมาณ กำลังไฟ และ FPS ว่าสมดุลกับเป้าหมายไหม"
-  if (missing === "MB") return "เริ่มจากเมนบอร์ดเพื่อกำหนด socket และชนิด RAM"
-  if (missing === "CPU") return "เลือก CPU ที่ socket ตรงกับเมนบอร์ด"
-  if (missing === "COOLER") return "เลือก cooler ที่รองรับ TDP ของ CPU"
-  if (missing === "RAM") return "เลือก RAM DDR ให้ตรงกับเมนบอร์ด"
-  if (missing === "GPU") return "เลือก GPU ตามเกมหรือ FPS ที่ต้องการ"
-  if (missing === "STORAGE") return "เลือก storage สำหรับระบบและเกม/ไฟล์งาน"
-  return "เลือก PSU ที่มีกำลังไฟเหลือพอหลังรวม CPU และ GPU"
+type AssemblyStep = {
+  type: ComponentType
+  title: string
+  action: string
+  lesson: string
 }
 
-function LearningPanel({ slots }: { slots: SlotState }) {
-  const totalTdp = computeTotalTdp(slots)
+const STEPS: AssemblyStep[] = [
+  {
+    type: "MB",
+    title: "ติดตั้งเมนบอร์ด",
+    action: "เลือกบอร์ดเป็นฐานของเครื่อง",
+    lesson: "เมนบอร์ดกำหนด socket ของ CPU, ชนิด RAM และช่องเสียบหลักทั้งหมด",
+  },
+  {
+    type: "CPU",
+    title: "ใส่ซีพียู",
+    action: "วาง CPU ลง socket",
+    lesson: "CPU ต้องตรง socket กับเมนบอร์ด เพราะหน้าสัมผัสและตำแหน่งล็อกไม่เหมือนกัน",
+  },
+  {
+    type: "COOLER",
+    title: "ติดตั้งชุดระบายความร้อน",
+    action: "ครอบ cooler บน CPU",
+    lesson: "Cooler ต้องรองรับ TDP ของ CPU เพื่อให้เครื่องไม่ร้อนเกินเวลาใช้งานหนัก",
+  },
+  {
+    type: "RAM",
+    title: "เสียบแรม",
+    action: "ใส่ RAM ในช่อง DIMM",
+    lesson: "RAM DDR4 และ DDR5 ใช้แทนกันไม่ได้ ต้องเลือกให้ตรงกับเมนบอร์ด",
+  },
+  {
+    type: "STORAGE",
+    title: "ติดตั้งพื้นที่เก็บข้อมูล",
+    action: "เพิ่ม SSD/HDD ให้ระบบ",
+    lesson: "Storage คือที่เก็บระบบปฏิบัติการ เกม และไฟล์งาน เครื่องเปิดไม่ได้ถ้าไม่มีไดรฟ์ระบบ",
+  },
+  {
+    type: "GPU",
+    title: "ใส่การ์ดจอ",
+    action: "เสียบ GPU ในช่อง PCIe",
+    lesson: "GPU มีผลมากกับ FPS เกม และเพิ่มภาระไฟให้ PSU",
+  },
+  {
+    type: "PSU",
+    title: "ติดตั้งพาวเวอร์ซัพพลาย",
+    action: "เลือก PSU ที่จ่ายไฟพอ",
+    lesson: "PSU ควรมีกำลังไฟเหลือเผื่อ CPU, GPU, อุปกรณ์เสริม และโหลดกระชาก",
+  },
+]
+
+function parseSpecs(component: ComponentResponse): Record<string, unknown> {
+  try {
+    return JSON.parse(component.specs) as Record<string, unknown>
+  } catch {
+    return {}
+  }
+}
+
+function formatSpecs(component: ComponentResponse): string {
+  const specs = parseSpecs(component)
+  if (component.socket) return component.socket
+  if (typeof specs.type === "string" && typeof specs.size === "number") {
+    return `${specs.size}GB ${specs.type}`
+  }
+  if (typeof specs.watt === "number") return `${specs.watt}W`
+  if (typeof specs.tdp === "number") return `${specs.tdp}W TDP`
+  if (typeof specs.vram === "number") return `${specs.vram}GB VRAM`
+  return component.type
+}
+
+function DraggablePart({
+  component,
+  disabled,
+}: {
+  component: ComponentResponse
+  disabled?: boolean
+}) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: `visual-comp-${component.id}`,
+      data: { component },
+      disabled,
+    })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.45 : disabled ? 0.35 : 1,
+    cursor: disabled ? "not-allowed" : isDragging ? "grabbing" : "grab",
+    zIndex: isDragging ? 60 : "auto",
+  }
+
+  return (
+    <button
+      ref={setNodeRef}
+      type="button"
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="w-full border-2 border-foreground bg-card p-3 text-left transition hover:border-primary disabled:cursor-not-allowed"
+      disabled={disabled}
+    >
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted">
+          {component.type} · {formatSpecs(component)}
+        </p>
+        <MousePointer2 className="h-3.5 w-3.5 shrink-0 text-muted" />
+      </div>
+      <p className="text-sm font-extrabold leading-tight">{component.name}</p>
+      <p className="mt-1 text-xs text-muted">฿{component.price.toLocaleString()}</p>
+    </button>
+  )
+}
+
+function StepRail({
+  activeIndex,
+  slots,
+  onSelect,
+}: {
+  activeIndex: number
+  slots: SlotState
+  onSelect: (index: number) => void
+}) {
+  return (
+    <div className="space-y-2">
+      {STEPS.map((step, index) => {
+        const done = Boolean(slots[step.type])
+        const active = index === activeIndex
+        return (
+          <button
+            key={step.type}
+            type="button"
+            onClick={() => onSelect(index)}
+            className={`flex w-full items-center justify-between gap-3 border-2 p-3 text-left transition ${
+              active
+                ? "border-primary bg-primary/10"
+                : "border-foreground bg-background hover:border-primary"
+            }`}
+          >
+            <div className="min-w-0">
+              <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted">
+                Step {index + 1}
+              </p>
+              <p className="truncate text-sm font-extrabold">{step.title}</p>
+            </div>
+            {done ? (
+              <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
+            ) : (
+              <CircleDashed className="h-5 w-5 shrink-0 text-muted" />
+            )}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function SystemCheck({ slots }: { slots: SlotState }) {
+  const total = computeTotalPrice(slots)
+  const tdp = computeTotalTdp(slots)
   const complete = isBuildComplete(slots)
-  const checks = REQUIRED_ORDER.map((type) => ({
-    type,
-    ok: Boolean(slots[type]),
-  }))
+  const fps = predictFps(slots.GPU)
+
+  const checks = [
+    { label: "Mainboard", ok: Boolean(slots.MB) },
+    { label: "CPU", ok: Boolean(slots.CPU) },
+    { label: "Cooling", ok: Boolean(slots.COOLER) },
+    { label: "Memory", ok: Boolean(slots.RAM) },
+    { label: "Storage", ok: Boolean(slots.STORAGE) },
+    { label: "Power", ok: Boolean(slots.PSU) },
+  ]
 
   return (
     <div className="border-2 border-foreground bg-card p-4">
       <div className="mb-4 border-b-2 border-foreground pb-3">
         <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em] text-primary">
-          Learning
+          Final Check
         </p>
-        <h2 className="text-2xl font-extrabold tracking-tight">
-          ลำดับการประกอบ
-        </h2>
+        <h2 className="text-2xl font-extrabold tracking-tight">พร้อมเปิดเครื่องไหม</h2>
       </div>
 
       <div className="space-y-2">
         {checks.map((check) => (
           <div
-            key={check.type}
-            className="flex items-center justify-between gap-3 border-2 border-foreground bg-background p-2"
+            key={check.label}
+            className="flex items-center justify-between border-2 border-foreground bg-background p-2 text-sm font-bold"
           >
-            <span className="text-xs font-bold">
-              {COMPONENT_TYPE_LABEL[check.type]}
-            </span>
+            {check.label}
             {check.ok ? (
               <CheckCircle className="h-4 w-4 text-primary" />
             ) : (
@@ -78,29 +232,34 @@ function LearningPanel({ slots }: { slots: SlotState }) {
         ))}
       </div>
 
-      <div className="mt-4 border-2 border-foreground bg-background p-3">
-        <div className="mb-2 flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-primary">
-          <Lightbulb className="h-4 w-4" />
-          Next
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="border-2 border-foreground bg-background p-3">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-muted">
+            Price
+          </p>
+          <p className="text-xl font-extrabold">฿{total.toLocaleString()}</p>
         </div>
-        <p className="text-sm leading-relaxed text-muted">{getNextStep(slots)}</p>
+        <div className="border-2 border-foreground bg-background p-3">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-muted">
+            Load
+          </p>
+          <p className="text-xl font-extrabold">{tdp}W</p>
+        </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-        <div className="border-2 border-foreground bg-background p-3">
-          <p className="mb-1 font-bold uppercase tracking-widest text-muted">
-            Power Load
+      <div className="mt-3 border-2 border-foreground bg-background p-3">
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-muted">
+          Result
+        </p>
+        <p className="text-sm font-bold">
+          {complete ? "ผ่านขั้นพื้นฐาน พร้อมทดสอบเปิดเครื่อง" : "ยังประกอบไม่ครบ"}
+        </p>
+        {fps ? (
+          <p className="mt-2 text-xs leading-relaxed text-muted">
+            FPS เป็นค่าประมาณเพื่อการเรียนรู้: Valorant {fps.valorant}, GTA V{" "}
+            {fps.gta5}, Cyberpunk {fps.cyberpunk}
           </p>
-          <p className="text-xl font-extrabold">{totalTdp}W</p>
-        </div>
-        <div className="border-2 border-foreground bg-background p-3">
-          <p className="mb-1 font-bold uppercase tracking-widest text-muted">
-            Boot
-          </p>
-          <p className="text-xl font-extrabold">
-            {complete ? "Ready" : "Pending"}
-          </p>
-        </div>
+        ) : null}
       </div>
     </div>
   )
@@ -108,18 +267,25 @@ function LearningPanel({ slots }: { slots: SlotState }) {
 
 export function VisualSimulatorClient({ components }: Props) {
   const [slots, setSlots] = useState<SlotState>({})
-  const [error, setError] = useState<string | null>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [message, setMessage] = useState<string | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 5 } })
   )
 
+  const activeStep = STEPS[activeIndex]
+  const activeParts = useMemo(
+    () => components.filter((component) => component.type === activeStep.type),
+    [activeStep.type, components]
+  )
+
   useEffect(() => {
-    if (!error) return
-    const t = setTimeout(() => setError(null), 4500)
+    if (!message) return
+    const t = setTimeout(() => setMessage(null), 4500)
     return () => clearTimeout(t)
-  }, [error])
+  }, [message])
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -134,14 +300,20 @@ export function VisualSimulatorClient({ components }: Props) {
       | undefined
     if (!draggedComponent) return
 
-    const result = checkCompat(draggedComponent, targetSlot, slots)
-    if (!result.ok) {
-      setError(result.reason ?? "ไม่สามารถวางได้")
+    if (targetSlot !== activeStep.type) {
+      setMessage(`ขั้นนี้ต้องประกอบ ${COMPONENT_TYPE_LABEL[activeStep.type]} ก่อน`)
       return
     }
 
-    setError(null)
+    const result = checkCompat(draggedComponent, targetSlot, slots)
+    if (!result.ok) {
+      setMessage(result.reason ?? "ไม่สามารถวางได้")
+      return
+    }
+
     setSlots((prev) => ({ ...prev, [targetSlot]: draggedComponent }))
+    setMessage(`ติดตั้ง ${COMPONENT_TYPE_LABEL[targetSlot]} แล้ว`)
+    setActiveIndex((prev) => Math.min(prev + 1, STEPS.length - 1))
   }
 
   const handleRemove = (type: ComponentType) => {
@@ -150,37 +322,83 @@ export function VisualSimulatorClient({ components }: Props) {
       delete next[type]
       return next
     })
+    const index = STEPS.findIndex((step) => step.type === type)
+    if (index >= 0) setActiveIndex(index)
   }
 
   const usedIds = Object.values(slots)
-    .filter((c): c is ComponentResponse => !!c)
-    .map((c) => c.id)
+    .filter((component): component is ComponentResponse => Boolean(component))
+    .map((component) => component.id)
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      {error ? (
+      {message ? (
         <div className="fixed right-4 top-4 z-50 max-w-sm border-2 border-primary bg-background p-4 text-primary shadow-lg">
           <div className="flex items-start gap-2">
-            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
-            <div>
-              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest">
-                ลงไม่ได้
-              </p>
-              <p className="text-sm">{error}</p>
-            </div>
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+            <p className="text-sm font-bold">{message}</p>
           </div>
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[260px_minmax(0,1fr)_300px]">
-        <ComponentSidebar components={components} usedIds={usedIds} />
-        <div className="min-w-0 xl:sticky xl:top-24">
-          <VisualPCCase slots={slots} onRemove={handleRemove} />
-        </div>
-        <div className="space-y-6 xl:sticky xl:top-24">
-          <LearningPanel slots={slots} />
-          <BuildSummary slots={slots} />
-        </div>
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <aside className="space-y-6">
+          <div className="border-b-2 border-foreground pb-3">
+            <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em] text-primary">
+              Lesson
+            </p>
+            <h2 className="text-2xl font-extrabold tracking-tight">ขั้นตอนประกอบ</h2>
+          </div>
+          <StepRail
+            activeIndex={activeIndex}
+            slots={slots}
+            onSelect={setActiveIndex}
+          />
+        </aside>
+
+        <main className="min-w-0 xl:sticky xl:top-24">
+          <VisualPCCase
+            slots={slots}
+            activeType={activeStep.type}
+            onRemove={handleRemove}
+          />
+        </main>
+
+        <aside className="space-y-6 xl:sticky xl:top-24">
+          <div className="border-2 border-foreground bg-card p-4">
+            <div className="mb-4 border-b-2 border-foreground pb-3">
+              <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em] text-primary">
+                Workbench
+              </p>
+              <h2 className="text-2xl font-extrabold tracking-tight">
+                {activeStep.title}
+              </h2>
+            </div>
+
+            <div className="mb-4 border-2 border-foreground bg-background p-3">
+              <div className="mb-2 flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-primary">
+                <Lightbulb className="h-4 w-4" />
+                ทำอะไร
+              </div>
+              <p className="text-sm font-bold">{activeStep.action}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                {activeStep.lesson}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              {activeParts.map((component) => (
+                <DraggablePart
+                  key={component.id}
+                  component={component}
+                  disabled={usedIds.includes(component.id)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <SystemCheck slots={slots} />
+        </aside>
       </div>
     </DndContext>
   )

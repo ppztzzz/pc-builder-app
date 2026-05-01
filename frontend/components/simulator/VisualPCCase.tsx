@@ -71,10 +71,11 @@ const VISUAL_SLOTS: VisualSlot[] = [
 type SlotProps = {
   slot: VisualSlot
   component: ComponentResponse | undefined
+  active: boolean
   onRemove: () => void
 }
 
-function VisualDropSlot({ slot, component, onRemove }: SlotProps) {
+function VisualDropSlot({ slot, component, active, onRemove }: SlotProps) {
   const { isOver, setNodeRef } = useDroppable({ id: `slot-${slot.type}` })
   const { Icon } = slot
 
@@ -84,6 +85,8 @@ function VisualDropSlot({ slot, component, onRemove }: SlotProps) {
       className={`absolute ${slot.className} border-2 p-2 transition-colors ${
         isOver
           ? "border-primary bg-primary/15"
+          : active
+            ? "border-primary bg-primary/10"
           : component
             ? "border-foreground bg-background"
             : "border-dashed border-muted bg-card/95"
@@ -136,10 +139,11 @@ function VisualDropSlot({ slot, component, onRemove }: SlotProps) {
 
 type Props = {
   slots: SlotState
+  activeType?: ComponentType
   onRemove: (type: ComponentType) => void
 }
 
-export function VisualPCCase({ slots, onRemove }: Props) {
+export function VisualPCCase({ slots, activeType, onRemove }: Props) {
   const filled = VISUAL_SLOTS.filter((slot) => slots[slot.type]).length
 
   return (
@@ -175,6 +179,7 @@ export function VisualPCCase({ slots, onRemove }: Props) {
             key={slot.type}
             slot={slot}
             component={slots[slot.type]}
+            active={slot.type === activeType}
             onRemove={() => onRemove(slot.type)}
           />
         ))}

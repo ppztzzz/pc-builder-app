@@ -45,11 +45,11 @@ export default function VisualSimulatorPage() {
           </Link>
         </div>
         <h1 className="border-b-2 border-foreground pb-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
-          ประกอบคอมแบบ Visual
+          บทเรียนประกอบคอมแบบ 2D
         </h1>
         <p className="mt-3 max-w-2xl text-muted">
-          หน้าใหม่สำหรับทดลอง simulator แบบเคส 2D วางชิ้นส่วนตามตำแหน่งจริง
-          โดยยังใช้ระบบตรวจ compatibility เดิม
+          ประกอบทีละขั้น เลือกอะไหล่จาก workbench แล้วลากลงตำแหน่งในเคส
+          พร้อมคำอธิบายว่าแต่ละชิ้นทำหน้าที่อะไรและต้องเข้ากันอย่างไร
         </p>
       </div>
 
