@@ -80,10 +80,14 @@ export function SimulatorClient({ components }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_300px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_300px] gap-6 items-start">
         <ComponentSidebar components={components} usedIds={usedIds} />
-        <PCCase slots={slots} onRemove={handleRemove} />
-        <BuildSummary slots={slots} />
+        <div className="lg:sticky lg:top-24">
+          <PCCase slots={slots} onRemove={handleRemove} />
+        </div>
+        <div className="lg:sticky lg:top-24">
+          <BuildSummary slots={slots} />
+        </div>
       </div>
     </DndContext>
   )

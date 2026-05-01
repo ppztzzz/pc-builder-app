@@ -20,7 +20,7 @@ export function DropSlot({ type, component, onRemove, iconName }: Props) {
   return (
     <div
       ref={setNodeRef}
-      className={`border-2 p-4 transition min-h-24 ${
+      className={`border-2 p-4 transition-colors min-h-24 ${
         isOver
           ? "border-primary bg-primary/10"
           : component

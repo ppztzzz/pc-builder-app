@@ -21,6 +21,8 @@ export function DraggableComponent({ component, disabled }: Props) {
     transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.4 : disabled ? 0.3 : 1,
     cursor: disabled ? "not-allowed" : isDragging ? "grabbing" : "grab",
+    position: "relative" as const,
+    zIndex: isDragging ? 50 : "auto",
   }
 
   return (
@@ -29,7 +31,7 @@ export function DraggableComponent({ component, disabled }: Props) {
       style={style}
       {...listeners}
       {...attributes}
-      className="border-2 border-foreground bg-card p-3 hover:border-primary transition select-none"
+      className="border-2 border-foreground bg-card p-3 hover:border-primary transition-colors select-none"
     >
       <p className="text-[10px] uppercase tracking-widest text-muted font-bold mb-1">
         {component.type}
