@@ -13,13 +13,19 @@ import type { CategoryResponse } from "@/shared/types/category"
 export default function HomePage() {
   const [categories, setCategories] = useState<CategoryResponse[]>([])
   const [articles, setArticles] = useState<ArticleResponse[]>([])
+  const [news, setNews] = useState<ArticleResponse[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([categoryApi.list(), articleApi.list()])
-      .then(([cats, list]) => {
+    Promise.all([
+      categoryApi.list(),
+      articleApi.list("ARTICLE"),
+      articleApi.list("NEWS"),
+    ])
+      .then(([cats, arts, newsList]) => {
         setCategories(cats)
-        setArticles(list)
+        setArticles(arts)
+        setNews(newsList)
       })
       .catch((e) => {
         console.error("Home page load failed:", e)
@@ -35,15 +41,11 @@ export default function HomePage() {
     )
   }
 
-  // Top 6 → Article mosaic; next 6 → News grid (no overlap)
-  const topArticles = articles.slice(0, 6)
-  const newsArticles = articles.slice(6, 12)
-
   return (
     <>
       <HeroBanner />
-      <Article articles={topArticles} />
-      <News articles={newsArticles} />
+      <Article articles={articles} />
+      <News articles={news} />
       <CategoryRow categories={categories} />
     </>
   )

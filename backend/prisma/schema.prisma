@@ -40,6 +40,7 @@ model Article {
   title      String
   content    String
   excerpt    String?        // สรุปสำหรับการ์ดหน้าแรก
+  type       String         @default("ARTICLE") // "ARTICLE" | "NEWS"
   isFeatured Boolean        @default(false)
   categoryId Int
   category   Category       @relation(fields: [categoryId], references: [id])
@@ -48,6 +49,7 @@ model Article {
 
   @@index([categoryId])
   @@index([isFeatured])
+  @@index([type])
 }
 
 model ArticleImage {

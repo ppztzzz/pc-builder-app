@@ -1,12 +1,16 @@
 import { fetchJson, jsonInit } from "./_fetch"
 import type {
   ArticleResponse,
+  ArticleType,
   CreateArticleRequest,
   UpdateArticleRequest,
 } from "@/shared/types/article"
 
 export const articleApi = {
-  list: () => fetchJson<ArticleResponse[]>("/api/articles"),
+  list: (type?: ArticleType) =>
+    fetchJson<ArticleResponse[]>(
+      type ? `/api/articles?type=${type}` : "/api/articles"
+    ),
 
   detail: (id: number) => fetchJson<ArticleResponse>(`/api/articles/${id}`),
 

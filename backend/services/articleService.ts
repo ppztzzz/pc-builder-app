@@ -1,12 +1,14 @@
 import { prisma } from "../prisma/client"
 import type {
+  ArticleType,
   CreateArticleRequest,
   UpdateArticleRequest,
 } from "@/shared/types/article"
 
 export const articleService = {
-  list: () =>
+  list: (type?: ArticleType) =>
     prisma.article.findMany({
+      where: type ? { type } : undefined,
       include: { images: true, category: true },
       orderBy: { createdAt: "desc" },
     }),
@@ -37,6 +39,7 @@ export const articleService = {
         title: dto.title,
         content: dto.content,
         excerpt: dto.excerpt,
+        type: dto.type,
         isFeatured: dto.isFeatured,
         categoryId: dto.categoryId,
         images: {

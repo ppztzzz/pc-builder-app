@@ -1,10 +1,12 @@
 import { articleService } from "@/backend/services/articleService"
 import { requireAdmin } from "@/backend/session"
+import type { ArticleType } from "@/shared/types/article"
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
   const featured = url.searchParams.get("featured")
   const categoryId = url.searchParams.get("categoryId")
+  const type = url.searchParams.get("type") as ArticleType | null
 
   if (featured === "true") {
     return Response.json(await articleService.featured())
@@ -12,7 +14,9 @@ export async function GET(req: Request) {
   if (categoryId) {
     return Response.json(await articleService.byCategory(Number(categoryId)))
   }
-  return Response.json(await articleService.list())
+  return Response.json(
+    await articleService.list(type === "ARTICLE" || type === "NEWS" ? type : undefined)
+  )
 }
 
 export async function POST(req: Request) {
