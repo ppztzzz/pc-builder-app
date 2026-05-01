@@ -172,9 +172,9 @@ export function VisualSimulatorClient({ components }: Props) {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[300px_1fr_320px]">
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[260px_minmax(0,1fr)_300px]">
         <ComponentSidebar components={components} usedIds={usedIds} />
-        <div className="min-w-0">
+        <div className="min-w-0 xl:sticky xl:top-24">
           <VisualPCCase slots={slots} onRemove={handleRemove} />
         </div>
         <div className="space-y-6 xl:sticky xl:top-24">

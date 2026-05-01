@@ -143,7 +143,7 @@ export function VisualPCCase({ slots, onRemove }: Props) {
   const filled = VISUAL_SLOTS.filter((slot) => slots[slot.type]).length
 
   return (
-    <div className="border-2 border-foreground bg-background p-4">
+    <div className="w-full min-w-0 border-2 border-foreground bg-background p-4">
       <div className="mb-4 flex items-start justify-between gap-4 border-b-2 border-foreground pb-3">
         <div>
           <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em] text-primary">
@@ -159,7 +159,7 @@ export function VisualPCCase({ slots, onRemove }: Props) {
         </div>
       </div>
 
-      <div className="relative aspect-4/5 min-h-130 overflow-hidden border-2 border-foreground bg-card sm:aspect-16/11 sm:min-h-140">
+      <div className="relative aspect-[4/5] w-full max-w-full overflow-hidden border-2 border-foreground bg-card sm:aspect-[16/11]">
         <div className="absolute inset-[4%] border-2 border-foreground bg-background" />
         <div className="absolute left-[4%] top-[4%] h-[92%] w-[8%] border-r-2 border-foreground bg-card" />
         <div className="absolute right-[4%] top-[4%] h-[92%] w-[5%] border-l-2 border-foreground bg-card" />
