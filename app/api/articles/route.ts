@@ -1,4 +1,5 @@
 import { articleService } from "@/backend/services/articleService"
+import { requireAdmin } from "@/backend/session"
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
@@ -6,15 +7,23 @@ export async function GET(req: Request) {
   const categoryId = url.searchParams.get("categoryId")
 
   if (featured === "true") {
-    const article = await articleService.featured()
-    return Response.json(article)
+    return Response.json(await articleService.featured())
   }
-
   if (categoryId) {
-    const articles = await articleService.byCategory(Number(categoryId))
-    return Response.json(articles)
+    return Response.json(await articleService.byCategory(Number(categoryId)))
+  }
+  return Response.json(await articleService.list())
+}
+
+export async function POST(req: Request) {
+  try {
+    await requireAdmin()
+  } catch (e) {
+    if (e instanceof Response) return e
+    throw e
   }
 
-  const articles = await articleService.list()
-  return Response.json(articles)
+  const body = await req.json()
+  const article = await articleService.create(body)
+  return Response.json(article)
 }
