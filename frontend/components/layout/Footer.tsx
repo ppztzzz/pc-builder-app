@@ -13,11 +13,7 @@ export function Footer() {
             </p>
           </div>
           <div className="text-sm sm:text-right">
-            <p className="uppercase tracking-widest text-xs text-background/50 mb-1">
-              Powered by
-            </p>
-            <p className="font-medium">Next.js • Prisma • SQLite</p>
-            <p className="text-background/70 mt-2">© 2026</p>
+            <p className="text-background/70">© 2026</p>
           </div>
         </div>
       </div>
