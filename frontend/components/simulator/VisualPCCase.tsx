@@ -163,7 +163,7 @@ export function VisualPCCase({ slots, activeType, onRemove }: Props) {
         </div>
       </div>
 
-      <div className="relative aspect-[4/5] w-full max-w-full overflow-hidden border-2 border-foreground bg-card sm:aspect-[16/11]">
+      <div className="relative aspect-4/5 w-full max-w-full overflow-hidden border-2 border-foreground bg-card sm:aspect-16/11">
         <div className="absolute inset-[4%] border-2 border-foreground bg-background" />
         <div className="absolute left-[4%] top-[4%] h-[92%] w-[8%] border-r-2 border-foreground bg-card" />
         <div className="absolute right-[4%] top-[4%] h-[92%] w-[5%] border-l-2 border-foreground bg-card" />

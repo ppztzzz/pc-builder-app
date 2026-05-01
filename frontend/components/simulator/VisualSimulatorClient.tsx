@@ -13,6 +13,8 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import {
   AlertCircle,
+  ArrowLeft,
+  ArrowRight,
   CheckCircle,
   CircleDashed,
   Lightbulb,
@@ -208,13 +210,30 @@ function SystemCheck({ slots }: { slots: SlotState }) {
   ]
 
   return (
-    <div className="border-2 border-foreground bg-card p-4">
+    <div
+      className={`border-2 p-4 ${
+        complete
+          ? "border-primary bg-primary/10"
+          : "border-foreground bg-card"
+      }`}
+    >
       <div className="mb-4 border-b-2 border-foreground pb-3">
         <p className="mb-1 text-xs font-bold uppercase tracking-[0.25em] text-primary">
           Final Check
         </p>
-        <h2 className="text-2xl font-extrabold tracking-tight">พร้อมเปิดเครื่องไหม</h2>
+        <h2 className="text-2xl font-extrabold tracking-tight">
+          {complete ? "ประกอบครบแล้ว" : "พร้อมเปิดเครื่องไหม"}
+        </h2>
       </div>
+
+      {complete ? (
+        <div className="mb-4 flex items-start gap-3 border-2 border-primary bg-background p-3 text-primary">
+          <CheckCircle className="mt-0.5 h-5 w-5 shrink-0" />
+          <p className="text-sm font-bold leading-relaxed">
+            ประกอบครบทุกขั้นแล้ว ตรวจความเข้ากันได้พื้นฐานผ่าน พร้อมทดสอบเปิดเครื่อง
+          </p>
+        </div>
+      ) : null}
 
       <div className="space-y-2">
         {checks.map((check) => (
@@ -269,6 +288,8 @@ export function VisualSimulatorClient({ components }: Props) {
   const [slots, setSlots] = useState<SlotState>({})
   const [activeIndex, setActiveIndex] = useState(0)
   const [message, setMessage] = useState<string | null>(null)
+  const isFirstStep = activeIndex === 0
+  const isLastStep = activeIndex === STEPS.length - 1
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -330,6 +351,14 @@ export function VisualSimulatorClient({ components }: Props) {
     .filter((component): component is ComponentResponse => Boolean(component))
     .map((component) => component.id)
 
+  const goPrevious = () => {
+    setActiveIndex((prev) => Math.max(prev - 1, 0))
+  }
+
+  const goNext = () => {
+    setActiveIndex((prev) => Math.min(prev + 1, STEPS.length - 1))
+  }
+
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       {message ? (
@@ -381,9 +410,33 @@ export function VisualSimulatorClient({ components }: Props) {
                 ทำอะไร
               </div>
               <p className="text-sm font-bold">{activeStep.action}</p>
+              <p className="mt-2 border-l-2 border-primary pl-3 text-sm font-bold text-primary">
+                ลากชิ้นส่วนด้านล่างไปยังตำแหน่งที่ขอบสีน้ำเงินในเคส
+              </p>
               <p className="mt-2 text-sm leading-relaxed text-muted">
                 {activeStep.lesson}
               </p>
+            </div>
+
+            <div className="mb-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={goPrevious}
+                disabled={isFirstStep}
+                className="inline-flex items-center justify-center gap-2 border-2 border-foreground px-3 py-2.5 text-xs font-bold uppercase tracking-widest transition hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                ย้อนกลับ
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                disabled={isLastStep}
+                className="inline-flex items-center justify-center gap-2 bg-foreground px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-background transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-foreground"
+              >
+                ถัดไป
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
 
             <div className="space-y-2">

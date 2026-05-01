@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Search, X } from "lucide-react"
 import { useTitle } from "@/frontend/hooks/useTitle"
@@ -11,7 +11,7 @@ import { getIcon } from "@/shared/constants/icons"
 import type { ArticleResponse, ArticleType } from "@/shared/types/article"
 import type { CategoryResponse } from "@/shared/types/category"
 
-export default function ArticlesPage() {
+function ArticlesPageInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -159,5 +159,19 @@ export default function ArticlesPage() {
         </>
       )}
     </div>
+  )
+}
+
+export default function ArticlesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-6xl px-4 py-20 text-center text-muted uppercase tracking-widest text-xs">
+          Loading...
+        </div>
+      }
+    >
+      <ArticlesPageInner />
+    </Suspense>
   )
 }
