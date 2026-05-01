@@ -1,10 +1,24 @@
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-card mt-12">
-      <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted">
-        <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
-          <p>© 2026 PC Builder — เว็บความรู้คอมพิวเตอร์</p>
-          <p>Made with Next.js + Prisma + SQLite</p>
+    <footer className="mt-16 border-t-2 border-foreground bg-foreground text-background">
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <p className="text-2xl font-extrabold tracking-tight mb-2">
+              PC<span className="text-primary">/</span>BUILDER
+            </p>
+            <p className="text-sm text-background/70 max-w-md">
+              นิตยสารออนไลน์เรื่องคอมพิวเตอร์ + ระบบจำลองประกอบเครื่อง
+              ตรวจ compatibility อัตโนมัติ
+            </p>
+          </div>
+          <div className="text-sm sm:text-right">
+            <p className="uppercase tracking-widest text-xs text-background/50 mb-1">
+              Powered by
+            </p>
+            <p className="font-medium">Next.js • Prisma • SQLite</p>
+            <p className="text-background/70 mt-2">© 2026</p>
+          </div>
         </div>
       </div>
     </footer>
