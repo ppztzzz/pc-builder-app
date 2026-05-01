@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { ArrowLeft, Calendar } from "lucide-react"
 import { articleApi } from "@/frontend/api/articleApi"
-import { Badge } from "@/frontend/components/ui/Badge"
+import { CategoryTag } from "@/frontend/components/ui/CategoryTag"
 import { ImageCarousel } from "@/frontend/components/article/ImageCarousel"
 import type { ArticleResponse } from "@/shared/types/article"
 
@@ -30,8 +31,8 @@ export default function ArticlePage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center text-muted">
-        กำลังโหลด...
+      <div className="mx-auto max-w-3xl px-4 py-20 text-center text-muted uppercase tracking-widest text-xs">
+        Loading...
       </div>
     )
   }
@@ -40,34 +41,41 @@ export default function ArticlePage() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <p className="text-muted mb-4">ไม่พบบทความ</p>
-        <Link href="/" className="text-primary hover:underline">
-          ← กลับหน้าแรก
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1 text-sm font-bold text-primary uppercase tracking-widest"
+        >
+          <ArrowLeft className="w-4 h-4" /> กลับหน้าแรก
         </Link>
       </div>
     )
   }
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-8">
+    <article className="mx-auto max-w-3xl px-4 py-10">
       <Link
         href="/"
-        className="inline-flex items-center gap-1 text-sm text-muted hover:text-foreground mb-4"
+        className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold text-muted hover:text-primary transition mb-6"
       >
-        ← กลับ
+        <ArrowLeft className="w-3.5 h-3.5" /> กลับ
       </Link>
 
       {article.category && (
-        <Badge className="mb-3">
-          {article.category.icon} {article.category.name}
-        </Badge>
+        <div className="mb-4">
+          <CategoryTag
+            iconName={article.category.icon}
+            name={article.category.name}
+          />
+        </div>
       )}
 
-      <h1 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
+      <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.05] mb-4">
         {article.title}
       </h1>
 
-      <p className="text-sm text-muted mb-6">
-        📅 {new Date(article.createdAt).toLocaleDateString("th-TH", {
+      <p className="text-xs uppercase tracking-widest text-muted mb-8 inline-flex items-center gap-1.5">
+        <Calendar className="w-3 h-3" />
+        {new Date(article.createdAt).toLocaleDateString("th-TH", {
           year: "numeric",
           month: "long",
           day: "numeric",
@@ -75,15 +83,15 @@ export default function ArticlePage() {
       </p>
 
       {article.images.length > 0 && (
-        <div className="mb-8">
+        <div className="mb-10">
           <ImageCarousel images={article.images} />
         </div>
       )}
 
-      <div className="prose prose-slate dark:prose-invert max-w-none">
+      <div className="text-lg leading-relaxed">
         {article.content.split("\n").map((para, i) =>
           para.trim() ? (
-            <p key={i} className="mb-4 leading-relaxed">
+            <p key={i} className="mb-5">
               {para}
             </p>
           ) : null

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import type { ArticleImageResponse } from "@/shared/types/article"
 
 type Props = {
@@ -16,29 +17,29 @@ export function ImageCarousel({ images }: Props) {
   const next = () => setIndex((i) => (i === images.length - 1 ? 0 : i + 1))
 
   return (
-    <div className="relative rounded-xl overflow-hidden bg-card border border-border">
+    <div className="relative overflow-hidden bg-card border-2 border-foreground">
       <div className="aspect-video relative">
         <img
           src={`/uploads/${images[index].image}`}
           alt=""
-          className="w-full h-full object-contain bg-black/5"
+          className="w-full h-full object-contain"
         />
 
         {images.length > 1 && (
           <>
             <button
               onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 hover:bg-black/70 text-white w-10 h-10 flex items-center justify-center transition"
+              className="absolute left-3 top-1/2 -translate-y-1/2 bg-foreground hover:bg-primary text-background w-10 h-10 flex items-center justify-center transition"
               aria-label="ก่อนหน้า"
             >
-              ‹
+              <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 hover:bg-black/70 text-white w-10 h-10 flex items-center justify-center transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 bg-foreground hover:bg-primary text-background w-10 h-10 flex items-center justify-center transition"
               aria-label="ถัดไป"
             >
-              ›
+              <ChevronRight className="w-5 h-5" />
             </button>
 
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
@@ -46,8 +47,8 @@ export function ImageCarousel({ images }: Props) {
                 <button
                   key={i}
                   onClick={() => setIndex(i)}
-                  className={`h-2 rounded-full transition ${
-                    i === index ? "w-6 bg-white" : "w-2 bg-white/50"
+                  className={`h-1.5 transition ${
+                    i === index ? "w-8 bg-foreground" : "w-4 bg-foreground/30"
                   }`}
                   aria-label={`รูปที่ ${i + 1}`}
                 />

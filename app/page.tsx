@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Hero } from "@/frontend/components/home/Hero"
+import { HeroBanner } from "@/frontend/components/home/HeroBanner"
+import { Article } from "@/frontend/components/home/Article"
+import { News } from "@/frontend/components/home/News"
 import { CategoryRow } from "@/frontend/components/home/CategoryRow"
-import { FeaturedArticle } from "@/frontend/components/home/FeaturedArticle"
-import { ArticleGrid } from "@/frontend/components/home/ArticleGrid"
 import { articleApi } from "@/frontend/api/articleApi"
 import { categoryApi } from "@/frontend/api/categoryApi"
 import type { ArticleResponse } from "@/shared/types/article"
@@ -31,18 +31,21 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-20 text-center text-muted">
-        กำลังโหลด...
+      <div className="mx-auto max-w-6xl px-4 py-20 text-center text-muted uppercase tracking-widest text-xs">
+        Loading...
       </div>
     )
   }
 
+  // Exclude featured from news so it doesn't appear twice
+  const newsArticles = articles.filter((a) => a.id !== featured?.id)
+
   return (
     <>
-      <Hero />
+      <HeroBanner />
+      <Article article={featured} />
+      <News articles={newsArticles} />
       <CategoryRow categories={categories} />
-      <FeaturedArticle article={featured} />
-      <ArticleGrid articles={articles} />
     </>
   )
 }
