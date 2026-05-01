@@ -27,10 +27,10 @@ export function News({ articles }: Props) {
 
       <div className="text-center mt-8">
         <Link
-          href="/articles"
+          href="/articles?type=NEWS"
           className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary hover:underline"
         >
-          View all
+          ดูข่าวสารทั้งหมด
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

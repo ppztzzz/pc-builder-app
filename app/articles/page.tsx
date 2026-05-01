@@ -7,7 +7,7 @@ import { articleApi } from "@/frontend/api/articleApi"
 import { categoryApi } from "@/frontend/api/categoryApi"
 import { ArticleCard } from "@/frontend/components/article/ArticleCard"
 import { getIcon } from "@/shared/constants/icons"
-import type { ArticleResponse } from "@/shared/types/article"
+import type { ArticleResponse, ArticleType } from "@/shared/types/article"
 import type { CategoryResponse } from "@/shared/types/category"
 
 export default function ArticlesPage() {
@@ -16,6 +16,9 @@ export default function ArticlesPage() {
 
   const initialCategory = searchParams.get("category")
   const initialQuery = searchParams.get("q") ?? ""
+  const typeParam = searchParams.get("type")
+  const type: ArticleType | null =
+    typeParam === "ARTICLE" || typeParam === "NEWS" ? typeParam : null
 
   const [articles, setArticles] = useState<ArticleResponse[]>([])
   const [categories, setCategories] = useState<CategoryResponse[]>([])
@@ -26,23 +29,24 @@ export default function ArticlesPage() {
   )
 
   useEffect(() => {
-    Promise.all([articleApi.list(), categoryApi.list()])
+    Promise.all([articleApi.list(type ?? undefined), categoryApi.list()])
       .then(([list, cats]) => {
         setArticles(list)
         setCategories(cats)
       })
       .catch((e) => console.error(e))
       .finally(() => setLoading(false))
-  }, [])
+  }, [type])
 
-  // Sync URL when filters change
+  // Sync URL when filters change (preserve ?type=)
   useEffect(() => {
     const params = new URLSearchParams()
+    if (type) params.set("type", type)
     if (query) params.set("q", query)
     if (categoryId) params.set("category", String(categoryId))
     const qs = params.toString()
     router.replace(qs ? `/articles?${qs}` : "/articles")
-  }, [query, categoryId, router])
+  }, [type, query, categoryId, router])
 
   const filtered = useMemo(() => {
     return articles.filter((a) => {
@@ -59,14 +63,20 @@ export default function ArticlesPage() {
     })
   }, [articles, categoryId, query])
 
+  const heading = type === "NEWS" ? "ข่าวสารทั้งหมด" : type === "ARTICLE" ? "บทความทั้งหมด" : "บทความและข่าวสาร"
+  const eyebrow = type === "NEWS" ? "News" : "Library"
+  const searchPlaceholder = type === "NEWS" ? "ค้นหาข่าวสาร..." : "ค้นหาบทความ..."
+  const emptyText = type === "NEWS" ? "ไม่พบข่าวสาร" : "ไม่พบบทความ"
+  const countLabel = type === "NEWS" ? "ข่าวสาร" : "บทความ"
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="border-b-2 border-foreground pb-4 mb-6">
         <p className="text-xs uppercase tracking-[0.25em] text-primary font-bold mb-1">
-          Library
+          {eyebrow}
         </p>
         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-          บทความทั้งหมด
+          {heading}
         </h1>
       </div>
 
@@ -77,7 +87,7 @@ export default function ArticlesPage() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="ค้นหาบทความ..."
+          placeholder={searchPlaceholder}
           className="w-full border-2 border-foreground bg-background pl-10 pr-10 py-3 focus:border-primary focus:outline-none"
         />
         {query && (
@@ -132,12 +142,12 @@ export default function ArticlesPage() {
         </p>
       ) : filtered.length === 0 ? (
         <p className="text-center py-20 text-muted uppercase tracking-widest text-xs">
-          ไม่พบบทความ
+          {emptyText}
         </p>
       ) : (
         <>
           <p className="text-xs uppercase tracking-widest text-muted mb-4">
-            พบ {filtered.length} บทความ
+            พบ {filtered.length} {countLabel}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filtered.map((a) => (

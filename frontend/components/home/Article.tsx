@@ -46,28 +46,15 @@ export function Article({ articles }: Props) {
         ))}
       </div>
 
-      {articles.length > 6 && (
-        <div className="text-center mt-8">
-          <Link
-            href="/articles"
-            className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary hover:underline"
-          >
-            ดูบทความทั้งหมด ({articles.length})
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      )}
-      {articles.length <= 6 && (
-        <div className="text-center mt-8">
-          <Link
-            href="/articles"
-            className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary hover:underline"
-          >
-            View all
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      )}
+      <div className="text-center mt-8">
+        <Link
+          href="/articles?type=ARTICLE"
+          className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary hover:underline"
+        >
+          ดูบทความทั้งหมด
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
     </section>
   )
 }
