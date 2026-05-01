@@ -2,13 +2,14 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LogOut, FileText, FolderTree, LayoutDashboard } from "lucide-react"
+import { LogOut, FileText, FolderTree, LayoutDashboard, Cpu } from "lucide-react"
 import { authApi } from "@/frontend/api/authApi"
 
 const links = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/articles", label: "บทความ", icon: FileText },
   { href: "/admin/categories", label: "หมวดหมู่", icon: FolderTree },
+  { href: "/admin/components", label: "ชิ้นส่วน", icon: Cpu },
 ]
 
 export function AdminNav() {

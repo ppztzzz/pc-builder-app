@@ -2,21 +2,28 @@
 
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { FileText, FolderTree, ArrowRight } from "lucide-react"
+import { FileText, FolderTree, Cpu, ArrowRight } from "lucide-react"
 import { articleApi } from "@/frontend/api/articleApi"
 import { categoryApi } from "@/frontend/api/categoryApi"
+import { componentApi } from "@/frontend/api/componentApi"
 import { useAuth } from "@/frontend/hooks/useAuth"
 
 export default function AdminDashboardPage() {
   const { username } = useAuth()
-  const [stats, setStats] = useState({ articles: 0, categories: 0 })
+  const [stats, setStats] = useState({ articles: 0, categories: 0, components: 0 })
 
   useEffect(() => {
-    Promise.all([articleApi.list(), categoryApi.list()]).then(
-      ([articles, cats]) => {
-        setStats({ articles: articles.length, categories: cats.length })
-      }
-    )
+    Promise.all([
+      articleApi.list(),
+      categoryApi.list(),
+      componentApi.list(),
+    ]).then(([articles, cats, comps]) => {
+      setStats({
+        articles: articles.length,
+        categories: cats.length,
+        components: comps.length,
+      })
+    })
   }, [])
 
   const cards = [
@@ -34,6 +41,13 @@ export default function AdminDashboardPage() {
       count: stats.categories,
       icon: FolderTree,
     },
+    {
+      href: "/admin/components",
+      label: "ชิ้นส่วน",
+      sublabel: "Simulator catalog",
+      count: stats.components,
+      icon: Cpu,
+    },
   ]
 
   return (
@@ -46,11 +60,12 @@ export default function AdminDashboardPage() {
       </h1>
       {username && (
         <p className="text-muted mb-8">
-          Welcome back, <span className="font-bold text-foreground">{username}</span>
+          Welcome back,{" "}
+          <span className="font-bold text-foreground">{username}</span>
         </p>
       )}
 
-      <div className="border-t-2 border-foreground pt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="border-t-2 border-foreground pt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {cards.map((c) => {
           const Icon = c.icon
           return (
