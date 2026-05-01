@@ -15,7 +15,7 @@ export const articleApi = {
   detail: (id: number) => fetchJson<ArticleResponse>(`/api/articles/${id}`),
 
   featured: () =>
-    fetchJson<ArticleResponse | null>("/api/articles?featured=true"),
+    fetchJson<ArticleResponse[]>("/api/articles?featured=true"),
 
   byCategory: (categoryId: number) =>
     fetchJson<ArticleResponse[]>(`/api/articles?categoryId=${categoryId}`),

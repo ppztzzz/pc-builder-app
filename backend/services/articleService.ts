@@ -14,7 +14,7 @@ export const articleService = {
     }),
 
   featured: () =>
-    prisma.article.findFirst({
+    prisma.article.findMany({
       where: { isFeatured: true },
       include: { images: true, category: true },
       orderBy: { createdAt: "desc" },

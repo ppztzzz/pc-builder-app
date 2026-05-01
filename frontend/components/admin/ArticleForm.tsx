@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Save, ArrowLeft, Star } from "lucide-react"
 import { articleApi } from "@/frontend/api/articleApi"
 import { ImageUploader } from "@/frontend/components/admin/ImageUploader"
-import type { ArticleResponse } from "@/shared/types/article"
+import type { ArticleResponse, ArticleType } from "@/shared/types/article"
 import type { CategoryResponse } from "@/shared/types/category"
 
 type Props = {
@@ -19,6 +19,7 @@ export function ArticleForm({ categories, initial }: Props) {
   const isEdit = !!initial
 
   const [title, setTitle] = useState(initial?.title ?? "")
+  const [type, setType] = useState<ArticleType>(initial?.type ?? "ARTICLE")
   const [excerpt, setExcerpt] = useState(initial?.excerpt ?? "")
   const [content, setContent] = useState(initial?.content ?? "")
   const [categoryId, setCategoryId] = useState(
@@ -37,6 +38,7 @@ export function ArticleForm({ categories, initial }: Props) {
       if (isEdit) {
         await articleApi.update(initial.id, {
           title,
+          type,
           excerpt: excerpt || undefined,
           content,
           categoryId,
@@ -49,6 +51,7 @@ export function ArticleForm({ categories, initial }: Props) {
       } else {
         const created = await articleApi.create({
           title,
+          type,
           excerpt: excerpt || undefined,
           content,
           categoryId,
@@ -127,6 +130,28 @@ export function ArticleForm({ categories, initial }: Props) {
         </div>
 
         <div className="space-y-4">
+          <div>
+            <label className="block text-xs uppercase tracking-widest font-bold mb-1.5">
+              ประเภท *
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {(["ARTICLE", "NEWS"] as ArticleType[]).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setType(t)}
+                  className={`px-3 py-2 text-xs uppercase tracking-widest font-bold border-2 transition-colors ${
+                    type === t
+                      ? "bg-foreground text-background border-foreground"
+                      : "border-border hover:border-foreground"
+                  }`}
+                >
+                  {t === "ARTICLE" ? "บทความ" : "ข่าวสาร"}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs uppercase tracking-widest font-bold mb-1.5">
               หมวดหมู่ *

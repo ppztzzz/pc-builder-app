@@ -16,6 +16,7 @@ import type { BuildListItem } from "@/shared/types/build"
 
 export default function HomePage() {
   useTitle("หน้าแรก")
+  const [featured, setFeatured] = useState<ArticleResponse[]>([])
   const [articles, setArticles] = useState<ArticleResponse[]>([])
   const [news, setNews] = useState<ArticleResponse[]>([])
   const [components, setComponents] = useState<ComponentResponse[]>([])
@@ -24,12 +25,14 @@ export default function HomePage() {
 
   useEffect(() => {
     Promise.all([
+      articleApi.featured(),
       articleApi.list("ARTICLE"),
       articleApi.list("NEWS"),
       componentApi.list(),
       buildApi.list(6),
     ])
-      .then(([arts, newsList, comps, buildsList]) => {
+      .then(([feat, arts, newsList, comps, buildsList]) => {
+        setFeatured(feat)
         setArticles(arts)
         setNews(newsList)
         setComponents(comps)
@@ -51,7 +54,7 @@ export default function HomePage() {
 
   return (
     <>
-      <HeroBanner />
+      <HeroBanner featured={featured} />
       <Article articles={articles} />
       <News articles={news} />
       <Components components={components} />
