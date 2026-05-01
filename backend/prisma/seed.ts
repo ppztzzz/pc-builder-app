@@ -84,6 +84,30 @@ async function main() {
   console.log(`✅ Articles: ${articles.length}`)
 
   // ========================
+  // ARTICLE IMAGES (port จาก PHP)
+  // ========================
+  const images = [
+    // Article 1 (CPU)
+    { articleId: 1, image: "1776649979_1126_unnamed.jpg", isCover: true },
+    { articleId: 1, image: "1776649979_3475_unnamed (1).jpg", isCover: false },
+    { articleId: 1, image: "1776649979_5368_unnamed (2).jpg", isCover: false },
+    // Article 2 (RAM)
+    { articleId: 2, image: "1776668021_2799_175679759168b69a9787e51.jpg", isCover: true },
+    { articleId: 2, image: "1776668021_9373_1756797521.jpg", isCover: false },
+    { articleId: 2, image: "1776668021_4865_843591021340-content2.jpg", isCover: false },
+    { articleId: 2, image: "1776668021_5019_001-show-ram.jpg", isCover: false },
+    // Article 5 (Mainboard)
+    { articleId: 5, image: "1776669916_1886_1761551329.jpg", isCover: true },
+    { articleId: 5, image: "1776669916_2794_1761550624.jpg", isCover: false },
+    { articleId: 5, image: "1776669916_1845_1761550625.jpg", isCover: false },
+    { articleId: 5, image: "1776669916_7432_1761551320.jpg", isCover: false },
+  ]
+  for (const img of images) {
+    await prisma.articleImage.create({ data: img })
+  }
+  console.log(`✅ ArticleImages: ${images.length}`)
+
+  // ========================
   // COMPONENTS (basic set สำหรับทดสอบ simulator)
   // ========================
   await prisma.component.deleteMany()
