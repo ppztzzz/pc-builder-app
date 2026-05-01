@@ -1,27 +1,51 @@
 {
-  "name": "01-pc-buokder-app",
+  "name": "01-pc-builder-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset"
+  },
+  "prisma": {
+    "schema": "backend/prisma/schema.prisma",
+    "seed": "tsx backend/prisma/seed.ts"
   },
   "dependencies": {
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "yarn": "^1.22.22"
+    "@prisma/client": "^6.19.0",
+    "bcryptjs": "^3.0.0",
+    "iron-session": "^8.0.0",
+    "nanoid": "^5.0.0",
+    "zod": "^3.24.0",
+    "@dnd-kit/core": "^6.3.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "framer-motion": "^11.15.0",
+    "qrcode.react": "^4.2.0",
+    "@react-pdf/renderer": "^4.1.0",
+    "next-themes": "^0.4.4",
+    "react-hook-form": "^7.54.0",
+    "@hookform/resolvers": "^3.9.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/bcryptjs": "^2.4.6",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "prisma": "^6.19.0",
     "tailwindcss": "^4",
+    "tsx": "^4.19.0",
     "typescript": "^5"
   }
 }

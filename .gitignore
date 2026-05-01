@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prisma — database file (commit migrations แต่ไม่ commit dev.db)
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
