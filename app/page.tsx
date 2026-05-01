@@ -12,19 +12,13 @@ import type { CategoryResponse } from "@/shared/types/category"
 
 export default function HomePage() {
   const [categories, setCategories] = useState<CategoryResponse[]>([])
-  const [featured, setFeatured] = useState<ArticleResponse | null>(null)
   const [articles, setArticles] = useState<ArticleResponse[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      categoryApi.list(),
-      articleApi.featured(),
-      articleApi.list(),
-    ])
-      .then(([cats, feat, list]) => {
+    Promise.all([categoryApi.list(), articleApi.list()])
+      .then(([cats, list]) => {
         setCategories(cats)
-        setFeatured(feat)
         setArticles(list)
       })
       .catch((e) => {
@@ -41,13 +35,14 @@ export default function HomePage() {
     )
   }
 
-  // Exclude featured from news so it doesn't appear twice
-  const newsArticles = articles.filter((a) => a.id !== featured?.id)
+  // Top 6 → Article mosaic; next 6 → News grid (no overlap)
+  const topArticles = articles.slice(0, 6)
+  const newsArticles = articles.slice(6, 12)
 
   return (
     <>
       <HeroBanner />
-      <Article article={featured} />
+      <Article articles={topArticles} />
       <News articles={newsArticles} />
       <CategoryRow categories={categories} />
     </>

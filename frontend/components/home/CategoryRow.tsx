@@ -20,7 +20,7 @@ export function CategoryRow({ categories }: Props) {
           return (
             <Link
               key={cat.id}
-              href={`/category/${cat.id}`}
+              href={`/articles?category=${cat.id}`}
               className="group relative flex flex-col items-center justify-center gap-3 aspect-square border-2 border-foreground bg-card hover:bg-primary hover:text-primary-fg hover:border-primary transition p-3"
             >
               <span className="absolute top-2 left-2 text-[10px] uppercase tracking-widest font-bold opacity-40 group-hover:opacity-100">
