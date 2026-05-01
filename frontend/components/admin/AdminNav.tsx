@@ -17,7 +17,7 @@ export function AdminNav() {
 
   const handleLogout = async () => {
     await authApi.logout()
-    router.push("/admin/login")
+    router.push("/admin")
   }
 
   return (

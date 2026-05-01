@@ -14,11 +14,11 @@ export default function AdminLayout({
   const pathname = usePathname()
   const { isAuthenticated } = useAuth()
 
-  const isLoginPage = pathname === "/admin/login"
+  const isLoginPage = pathname === "/admin"
 
   useEffect(() => {
     if (isAuthenticated === false && !isLoginPage) {
-      router.push("/admin/login")
+      router.push("/admin")
     }
     if (isAuthenticated === true && isLoginPage) {
       router.push("/admin/dashboard")
