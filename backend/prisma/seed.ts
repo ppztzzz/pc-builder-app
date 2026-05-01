@@ -24,13 +24,13 @@ async function main() {
   // CATEGORIES
   // ========================
   const categories = [
-    { id: 1, name: "ซีพียู", icon: "🧠" },
-    { id: 2, name: "แรม", icon: "💾" },
-    { id: 3, name: "เมนบอร์ด", icon: "🖥️" },
-    { id: 4, name: "การ์ดจอ", icon: "🎮" },
-    { id: 5, name: "พื้นที่เก็บข้อมูล", icon: "💿" },
-    { id: 6, name: "พาวเวอร์ซัพพลาย", icon: "⚡" },
-    { id: 7, name: "ชุดระบายความร้อน", icon: "❄️" },
+    { id: 1, name: "ซีพียู", icon: "Cpu" },
+    { id: 2, name: "แรม", icon: "MemoryStick" },
+    { id: 3, name: "เมนบอร์ด", icon: "CircuitBoard" },
+    { id: 4, name: "การ์ดจอ", icon: "MonitorCog" },
+    { id: 5, name: "พื้นที่เก็บข้อมูล", icon: "HardDrive" },
+    { id: 6, name: "พาวเวอร์ซัพพลาย", icon: "Plug" },
+    { id: 7, name: "ชุดระบายความร้อน", icon: "Fan" },
   ]
 
   for (const cat of categories) {
