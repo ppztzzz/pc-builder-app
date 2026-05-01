@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { LogOut, FileText, FolderTree, LayoutDashboard, Cpu } from "lucide-react"
 import { authApi } from "@/frontend/api/authApi"
 
@@ -14,11 +14,11 @@ const links = [
 
 export function AdminNav() {
   const pathname = usePathname()
-  const router = useRouter()
 
   const handleLogout = async () => {
     await authApi.logout()
-    router.push("/admin")
+    // full reload so session cookie clear is picked up by useAuth
+    window.location.href = "/"
   }
 
   return (

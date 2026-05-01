@@ -1,12 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { LogIn } from "lucide-react"
 import { authApi } from "@/frontend/api/authApi"
 
 export default function AdminLoginPage() {
-  const router = useRouter()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -18,7 +16,8 @@ export default function AdminLoginPage() {
     setSubmitting(true)
     try {
       await authApi.login({ username, password })
-      router.push("/admin/dashboard")
+      // full reload so AdminLayout's useAuth re-reads the new session cookie
+      window.location.href = "/admin/dashboard"
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed")
       setSubmitting(false)
@@ -78,10 +77,6 @@ export default function AdminLoginPage() {
             {submitting ? "Signing in..." : "Sign in"}
           </button>
         </form>
-
-        <p className="text-xs text-muted mt-6 text-center uppercase tracking-widest">
-          Default: admin / admin123
-        </p>
       </div>
     </div>
   )
