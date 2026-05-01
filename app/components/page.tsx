@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Search, X } from "lucide-react"
 import { componentApi } from "@/frontend/api/componentApi"
 import { ComponentCard } from "@/frontend/components/component/ComponentCard"
+import { useTitle } from "@/frontend/hooks/useTitle"
 import {
   COMPONENT_TYPES,
   COMPONENT_TYPE_LABEL,
@@ -18,6 +19,7 @@ import type {
 type Sort = "price-asc" | "price-desc" | "name"
 
 function ComponentsPageInner() {
+  useTitle("ชิ้นส่วน")
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -163,9 +165,9 @@ function ComponentsPageInner() {
           <p className="text-xs uppercase tracking-widest text-muted mb-4">
             พบ {filtered.length} ชิ้น
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 items-stretch">
             {filtered.map((c) => (
-              <Link key={c.id} href={`/simulator`}>
+              <Link key={c.id} href={`/simulator`} className="block h-full">
                 <ComponentCard component={c} />
               </Link>
             ))}

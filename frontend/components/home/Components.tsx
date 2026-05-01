@@ -27,9 +27,9 @@ export function Components({ components }: Props) {
     <section className="mx-auto max-w-6xl px-4 py-12 border-t border-border">
       <SectionTitle label="Catalog" title="ชิ้นส่วน" />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 items-stretch">
         {featured.map((c) => (
-          <Link key={c.id} href={`/components?type=${c.type}`}>
+          <Link key={c.id} href={`/components?type=${c.type}`} className="block h-full">
             <ComponentCard component={c} />
           </Link>
         ))}
